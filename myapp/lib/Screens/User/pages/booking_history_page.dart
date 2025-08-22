@@ -18,4 +18,5 @@ class BookingHistoryPage extends StatelessWidget {
       ),
     );
   }
+
 }
