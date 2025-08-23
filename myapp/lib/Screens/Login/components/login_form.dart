@@ -4,6 +4,7 @@ import 'package:myapp/Screens/Admin/admin_home.dart';
 import 'package:myapp/Screens/User/user_home.dart';
 import 'package:myapp/Screens/guest/guest_home.dart';
 import 'package:myapp/auth/api_service.dart';
+import 'package:myapp/security/token_manager.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -36,6 +37,7 @@ class _LoginFormState extends State<LoginForm> {
 
       String token = response["token"];
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      await TokenManager.saveToken(token);
 
       String username = decodedToken["sub"];   // username claim
       String role = decodedToken["roles"];     // e.g., "ADMIN", "USER", "GUEST"

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'pages/vehicle_detail_page.dart';
-import 'pages/service_rate_page.dart';
-import 'pages/payment_view_page.dart';
-import 'pages/expenses_page.dart';
-import 'pages/payment_settlement_page.dart';
-import 'pages/notification_page.dart';
-import 'pages/queue_admin_page.dart';
+import 'package:myapp/Screens/Admin/pages/vehicle_detail_page.dart';
+import 'package:myapp/Screens/Admin/pages/service_rate_page.dart';
+import 'package:myapp/Screens/Admin/pages/payment_view_page.dart';
+import 'package:myapp/Screens/Admin/pages/expenses_page.dart';
+import 'package:myapp/Screens/Admin/pages/payment_settlement_page.dart';
+import 'package:myapp/Screens/Admin/pages/notification_page.dart';
+import 'package:myapp/Screens/Admin/pages/queue_admin_page.dart';
+
+import 'package:myapp/Screens/User/pages/about_page.dart';
+import 'package:myapp/Screens/User/pages/booking_page.dart';
+import 'package:myapp/Screens/User/pages/queue_page.dart';
+import 'package:myapp/Screens/User/pages/home_page.dart';
 
 class AdminHome extends StatefulWidget {
   final String username;
@@ -16,51 +21,121 @@ class AdminHome extends StatefulWidget {
 }
 
 class _AdminHomeState extends State<AdminHome> {
-  int _selectedIndex = 0;
+  int _currentIndex = 0;
 
-  final List<Map<String, dynamic>> _menuItems = [
-    {'title': 'Vehicle Detail', 'icon': Icons.directions_car, 'page': const VehicleDetailPage()},
-    {'title': 'Service + Rate', 'icon': Icons.home_repair_service, 'page': const ServiceRatePage()},
-    {'title': 'View Payment', 'icon': Icons.payment, 'page': const PaymentViewPage()},
-    {'title': 'Expenses', 'icon': Icons.money_off, 'page': const ExpensesPage()},
-    {'title': 'Payment Settlement', 'icon': Icons.account_balance_wallet, 'page': const PaymentSettlementPage()},
-    {'title': 'Notification', 'icon': Icons.notifications, 'page': const NotificationPage()},
-    {'title': 'Queue (Change Order)', 'icon': Icons.queue_play_next, 'page': const QueueAdminPage()},
+  late final List<Widget> _pages = [
+    HomePage(username: widget.username),
+    const BookingPage(),
+    const QueuePage(),
+    const AboutPage(),
   ];
+
+  // ✅ Build drawer items at runtime so we can pass widget.username
+  List<Map<String, dynamic>> buildDrawerItems() {
+    return [
+      {
+        'title': 'Vehicle Detail',
+        'icon': Icons.directions_car,
+        'page': VehicleDetailPage(userName: widget.username), // removed const
+      },
+      {
+        'title': 'Service + Rate',
+        'icon': Icons.home_repair_service,
+        'page': const ServiceRatePage(),
+      },
+      {
+        'title': 'View Payment',
+        'icon': Icons.payment,
+        'page': const PaymentViewPage(),
+      },
+      {
+        'title': 'Expenses',
+        'icon': Icons.money_off,
+        'page': const ExpensesPage(),
+      },
+      {
+        'title': 'Payment Settlement',
+        'icon': Icons.account_balance_wallet,
+        'page': const PaymentSettlementPage(),
+      },
+      {
+        'title': 'Notification',
+        'icon': Icons.notifications,
+        'page': const NotificationPage(),
+      },
+      {
+        'title': 'Queue (Change Order)',
+        'icon': Icons.queue_play_next,
+        'page': const QueueAdminPage(),
+      },
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_menuItems[_selectedIndex]['title']),
+        title: Text(_titleForIndex(_currentIndex)),
+        centerTitle: true,
       ),
+
+      // ✅ Admin Drawer
       drawer: Drawer(
         child: ListView(
           children: [
             UserAccountsDrawerHeader(
               accountName: Text(widget.username),
-              accountEmail: const Text("Admin"),
+              accountEmail: const Text("ADMIN"),
               currentAccountPicture: const CircleAvatar(
-                child: Icon(Icons.admin_panel_settings, size: 32),
+                child: Icon(Icons.admin_panel_settings),
               ),
             ),
-            ..._menuItems.asMap().entries.map((entry) {
-              int idx = entry.key;
-              var item = entry.value;
-              return ListTile(
-                leading: Icon(item['icon']),
-                title: Text(item['title']),
-                selected: idx == _selectedIndex,
-                onTap: () {
-                  setState(() => _selectedIndex = idx);
-                  Navigator.pop(context); // close drawer
-                },
-              );
-            }),
+            ...buildDrawerItems().map((item) => ListTile(
+              leading: Icon(item['icon']),
+              title: Text(item['title']),
+              onTap: () {
+                Navigator.pop(context); // close drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => item['page']),
+                );
+              },
+            )),
           ],
         ),
       ),
-      body: _menuItems[_selectedIndex]['page'],
+
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        onTap: (i) => setState(() => _currentIndex = i),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'HOME'),
+          BottomNavigationBarItem(icon: Icon(Icons.event_note_outlined), label: 'BOOKING'),
+          BottomNavigationBarItem(icon: Icon(Icons.queue_outlined), label: 'QUEUE'),
+          BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: 'ABOUT'),
+        ],
+      ),
     );
+  }
+
+  String _titleForIndex(int i) {
+    switch (i) {
+      case 0:
+        return 'Home';
+      case 1:
+        return 'Booking';
+      case 2:
+        return 'Queue';
+      case 3:
+        return 'About';
+      default:
+        return 'Admin';
+    }
   }
 }

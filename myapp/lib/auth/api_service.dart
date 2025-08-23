@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:myapp/constants.dart';
 
 class ApiService {
-  static const String baseUrl = "http://localhost:8081/api/v1/auth";
+  static final String? baseUrl = dotenv.env['BASE_URL'] ?? 'http://localhost:8080';
+  static final String authEndpoint = "$baseUrl$BASE_URL_AUTH";
 
   static Future<Map<String, dynamic>> login(String username, String password) async {
-    final url = Uri.parse("$baseUrl/login");
+    final url = Uri.parse("$authEndpoint/login");
 
     final response = await http.post(
       url,
