@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:myapp/constants.dart';
-import 'package:myapp/model/vehicle_model.dart';
+import 'package:myapp/dto/vehicle_model.dart';
 import 'package:myapp/security/token_manager.dart';
 
 class VehicleService {
@@ -14,9 +14,14 @@ class VehicleService {
   // Create vehicle
   static Future<Vehicle?> createVehicle(Vehicle vehicle) async {
     final url = Uri.parse('$vehicleEndpoint/createVehicle');
+    String? token = await TokenManager.getToken();
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': ?token,
+        'Content-Type': 'application/json',
+      },
       body: jsonEncode({
         'vehicleType': vehicle.vehicleType,
         'vehicleNumber': vehicle.vehicleNumber,
@@ -38,10 +43,14 @@ class VehicleService {
   static Future<List<Vehicle>> fetchAllVehicles() async {
     final url = Uri.parse('$vehicleEndpoint/getAllVehicles');
     String? token = await TokenManager.getToken();
-    final response = await http.get(url, headers: {'accept': '*/*',
+    final response = await http.get(
+      url,
+      headers: {
+        'accept': '*/*',
         'Authorization': ?token,
-        'Content-Type': 'application/json'
-    });
+        'Content-Type': 'application/json',
+      },
+    );
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -60,9 +69,14 @@ class VehicleService {
     }
 
     final url = Uri.parse('$vehicleEndpoint/${vehicle.vehicleId}');
+    String? token = await TokenManager.getToken();
     final response = await http.put(
       url,
-      headers: {'Content-Type': 'application/json'},
+        headers: {
+          'accept': '*/*',
+          'Authorization': ?token,
+          'Content-Type': 'application/json',
+        },
       body: jsonEncode(vehicle.toJson()),
     );
 
@@ -77,7 +91,12 @@ class VehicleService {
   // Delete vehicle
   static Future<bool> deleteVehicle(int? vehicleId) async {
     final url = Uri.parse('$vehicleEndpoint/$vehicleId');
-    final response = await http.delete(url, headers: {'accept': '*/*'});
+    String? token = await TokenManager.getToken();
+    final response = await http.delete(url, headers: {
+      'accept': '*/*',
+      'Authorization': ?token,
+      'Content-Type': 'application/json',
+    });
 
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/model/vehicle_model.dart';
+import 'package:myapp/dto/vehicle_model.dart';
 import 'package:myapp/services/vehicle_service.dart';
 
 class VehicleDetailPage extends StatefulWidget {

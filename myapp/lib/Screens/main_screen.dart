@@ -28,6 +28,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
+  String get username => widget.username;
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -63,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
 
             // Admin full menu
             if (widget.role == "admin") ...[
-              _buildDrawerItem("Vehicle Detail", const VehicleDetailPage()),
+              _buildDrawerItem("Vehicle Detail", VehicleDetailPage(userName: username)),
               _buildDrawerItem("Service + Rate", const ServiceRatePage()),
               _buildDrawerItem("View Payment", const PaymentViewPage()),
               _buildDrawerItem("Expenses", const ExpensesPage()),

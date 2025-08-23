@@ -6,7 +6,7 @@ class Vehicle {
   final String userName;
 
   Vehicle({
-    required this.vehicleId,
+    this.vehicleId,
     required this.vehicleType,
     required this.vehicleNumber,
     required this.model,
