@@ -12,12 +12,12 @@ class VehicleDetailPage extends StatefulWidget {
 
 class _VehicleDetailPageState extends State<VehicleDetailPage> {
   final List<Vehicle> _vehicles = [];
-
   final _typeController = TextEditingController();
   final _modelController = TextEditingController();
   final _numberController = TextEditingController();
 
   Vehicle? _editingVehicle; // Track which vehicle is being edited
+  String? _errorMessage; // To hold error messages
 
   @override
   void initState() {
@@ -38,6 +38,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     _modelController.clear();
     _numberController.clear();
     _editingVehicle = null;
+    setState(() {
+      _errorMessage = null; // Clear error message when form is cleared
+    });
   }
 
   void _submitVehicle() async {
@@ -45,7 +48,17 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     final model = _modelController.text.trim();
     final number = _numberController.text.trim();
 
-    if (type.isEmpty || model.isEmpty || number.isEmpty) return;
+    // Check if any field is empty and show error
+    if (type.isEmpty || model.isEmpty || number.isEmpty) {
+      setState(() {
+        _errorMessage = 'All fields are mandatory. Please fill them in.';
+      });
+      return;
+    }
+
+    setState(() {
+      _errorMessage = null; // Clear error message on successful validation
+    });
 
     if (_editingVehicle == null) {
       // Add vehicle
@@ -126,6 +139,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
               controller: _numberController,
               decoration: const InputDecoration(labelText: 'Vehicle Number'),
             ),
+            if (_errorMessage != null) // Display error message if any field is empty
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  _errorMessage!,
+                  style: TextStyle(color: Colors.red, fontSize: 14),
+                ),
+              ),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -149,10 +170,23 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
               ],
             ),
             const Divider(height: 30),
-            const Text(
-              "All Vehicles",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Text(
+                  "All Vehicles",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: _loadVehicles, // Refresh button to reload vehicles
+                  child: const Text(
+                    "Refresh List",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                ),
+              ],
             ),
+            const Divider(height: 10),
             Expanded(
               child: ListView.builder(
                 itemCount: _vehicles.length,
