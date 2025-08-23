@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/dto/farmerservice.dart';  // Make sure you have a Service model
-import 'package:myapp/services/farmservices.dart'; // Service for CRUD
-import 'package:myapp/dto/vehicle_model.dart'; // For vehicle dropdown
-import 'package:myapp/services/vehicle_service.dart'; // Vehicle service for fetching vehicles
+import 'package:myapp/dto/farmerservice.dart';  // Your Service model
+import 'package:myapp/services/farmservices.dart'; // Service CRUD
+import 'package:myapp/dto/vehicle_model.dart'; // Vehicle model
+import 'package:myapp/services/vehicle_service.dart'; // Vehicle service
 
 class ServiceRatePage extends StatefulWidget {
   const ServiceRatePage({Key? key}) : super(key: key);
@@ -17,18 +17,16 @@ class _ServiceRatePageState extends State<ServiceRatePage> {
   final _serviceNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   Vehicle? _selectedVehicle;
-  Service? _editingService;  // To track if we're editing an existing service
-
-  String? _errorMessage;  // To hold error messages
+  Service? _editingService;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _loadVehicles();  // Load vehicles for the dropdown
-    _loadServices();  // Load existing services
+    _loadVehicles();
+    _loadServices();
   }
 
-  // Fetch all vehicles to populate the dropdown
   Future<void> _loadVehicles() async {
     final fetchedVehicles = await VehicleService.fetchAllVehicles();
     setState(() {
@@ -37,7 +35,6 @@ class _ServiceRatePageState extends State<ServiceRatePage> {
     });
   }
 
-  // Fetch all services
   Future<void> _loadServices() async {
     final fetchedServices = await FarmerService.fetchAllServices();
     setState(() {
@@ -46,23 +43,20 @@ class _ServiceRatePageState extends State<ServiceRatePage> {
     });
   }
 
-  // Clear form inputs
   void _clearForm() {
     _serviceNameController.clear();
     _descriptionController.clear();
     setState(() {
+      _selectedVehicle = null;
+      _editingService = null;
       _errorMessage = null;
-      _selectedVehicle = null;  // Reset selected vehicle
-      _editingService = null;   // Reset editing state
     });
   }
 
-  // Submit the service (add or update)
   void _submitService() async {
     final serviceName = _serviceNameController.text.trim();
     final description = _descriptionController.text.trim();
 
-    // Validate fields
     if (serviceName.isEmpty || description.isEmpty || _selectedVehicle == null) {
       setState(() {
         _errorMessage = 'All fields are mandatory. Please fill them in.';
@@ -75,21 +69,19 @@ class _ServiceRatePageState extends State<ServiceRatePage> {
     });
 
     if (_editingService == null) {
-      // Add service
       final newService = Service(
         serviceName: serviceName,
         description: description,
         vehicleId: _selectedVehicle!.vehicleId!,
       );
-      final createdService = await FarmerService.createService(newService);
-      if (createdService != null) {
+      final created = await FarmerService.createService(newService);
+      if (created != null) {
         setState(() {
-          _services.add(createdService);
+          _services.add(created);
         });
         _clearForm();
       }
     } else {
-      // Update service
       final updatedService = Service(
         serviceId: _editingService!.serviceId,
         serviceName: serviceName,
@@ -98,30 +90,39 @@ class _ServiceRatePageState extends State<ServiceRatePage> {
       );
       final success = await FarmerService.updateService(updatedService);
       if (success) {
-        await _loadServices();  // Reload services
+        await _loadServices();
         _clearForm();
       }
     }
   }
 
-  // Start editing a service
   void _startEditing(Service service) {
     setState(() {
       _editingService = service;
       _serviceNameController.text = service.serviceName;
       _descriptionController.text = service.description;
-      _selectedVehicle = _vehicles.firstWhere((v) => v.vehicleId == service.vehicleId);
+      _selectedVehicle = _vehicles.firstWhere(
+            (v) => v.vehicleId == service.vehicleId,
+        orElse: () => _vehicles.first,
+      );
     });
   }
 
-  // Delete a service
   Future<void> _deleteService(int id) async {
-    final success = await FarmerService.deleteService(id);
-    if (success) {
+    final deleted = await FarmerService.deleteService(id);
+    if (deleted) {
       setState(() {
-        _services.removeWhere((service) => service.serviceId == id);
+        _services.removeWhere((s) => s.serviceId == id);
       });
     }
+  }
+
+  String _getVehicleDisplayName(int vehicleId) {
+    final vehicle = _vehicles.firstWhere(
+          (v) => v.vehicleId == vehicleId,
+      orElse: () => Vehicle(vehicleId: vehicleId, model: 'Unknown', vehicleType: 'Unknown', vehicleNumber: '', userName: ''),
+    );
+    return '${vehicle.model} (${vehicle.vehicleType})';
   }
 
   @override
@@ -129,7 +130,7 @@ class _ServiceRatePageState extends State<ServiceRatePage> {
     final isEditing = _editingService != null;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Service Rate Management")),
+      appBar: AppBar(title: const Text("Service Management")),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -188,9 +189,21 @@ class _ServiceRatePageState extends State<ServiceRatePage> {
               ],
             ),
             const Divider(height: 30),
-            const Text(
-              "All Services",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Text(
+                  "All Services",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: _loadServices,
+                  child: const Text(
+                    "Refresh List",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                ),
+              ],
             ),
             const Divider(height: 10),
             Expanded(
@@ -198,10 +211,12 @@ class _ServiceRatePageState extends State<ServiceRatePage> {
                 itemCount: _services.length,
                 itemBuilder: (context, index) {
                   final service = _services[index];
+                  final vehicleName = _getVehicleDisplayName(service.vehicleId);
                   return Card(
                     child: ListTile(
                       title: Text(service.serviceName),
-                      subtitle: Text("Vehicle: ${service.vehicleId} - ${service.description}"),
+                      subtitle: Text("Vehicle: $vehicleName\n${service.description}"),
+                      isThreeLine: true,
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

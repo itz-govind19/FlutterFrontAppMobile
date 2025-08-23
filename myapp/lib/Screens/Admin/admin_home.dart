@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/Screens/Admin/pages/rate_page.dart';
 import 'package:myapp/Screens/Admin/pages/vehicle_detail_page.dart';
 import 'package:myapp/Screens/Admin/pages/service_rate_page.dart';
 import 'package:myapp/Screens/Admin/pages/payment_view_page.dart';
@@ -39,9 +40,14 @@ class _AdminHomeState extends State<AdminHome> {
         'page': VehicleDetailPage(userName: widget.username), // removed const
       },
       {
-        'title': 'Service + Rate',
+        'title': 'Service',
         'icon': Icons.home_repair_service,
         'page': const ServiceRatePage(),
+      },
+      {
+        'title': 'Rates Per Service',
+        'icon': Icons.home_repair_service,
+        'page': const RatePage(),
       },
       {
         'title': 'View Payment',

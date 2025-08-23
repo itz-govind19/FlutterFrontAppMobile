@@ -4,6 +4,7 @@ import 'package:myapp/Screens/Admin/pages/notification_page.dart';
 import 'package:myapp/Screens/Admin/pages/payment_settlement_page.dart';
 import 'package:myapp/Screens/Admin/pages/payment_view_page.dart';
 import 'package:myapp/Screens/Admin/pages/queue_admin_page.dart';
+import 'package:myapp/Screens/Admin/pages/rate_page.dart';
 import 'package:myapp/Screens/Admin/pages/service_rate_page.dart';
 import 'package:myapp/Screens/Admin/pages/vehicle_detail_page.dart';
 import 'package:myapp/Screens/User/pages/about_page.dart';
@@ -66,7 +67,8 @@ class _MainScreenState extends State<MainScreen> {
             // Admin full menu
             if (widget.role == "admin") ...[
               _buildDrawerItem("Vehicle Detail", VehicleDetailPage(userName: username)),
-              _buildDrawerItem("Service + Rate", const ServiceRatePage()),
+              _buildDrawerItem("Services", const ServiceRatePage()),
+              _buildDrawerItem("Rates Per Service", RatePage()),
               _buildDrawerItem("View Payment", const PaymentViewPage()),
               _buildDrawerItem("Expenses", const ExpensesPage()),
               _buildDrawerItem("Payment Settlement", const PaymentSettlementPage()),
