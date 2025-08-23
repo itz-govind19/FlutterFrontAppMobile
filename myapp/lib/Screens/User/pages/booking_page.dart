@@ -267,6 +267,11 @@ class _BookingPageState extends State<BookingPage> {
                         _expectedDate == null
                             ? "No Date Chosen"
                             : DateFormat("yyyy-MM-dd HH:mm").format(_expectedDate!),
+                        style: TextStyle(
+                          color: _expectedDate == null
+                              ? Colors.red // Color when date is not selected
+                              : Colors.black, // Default color
+                        ),
                       ),
                     ),
                     TextButton(
