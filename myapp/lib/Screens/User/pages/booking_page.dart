@@ -18,7 +18,6 @@ class _BookingPageState extends State<BookingPage> {
   // Controllers
   final TextEditingController _farmerNameController = TextEditingController();
   final TextEditingController _farmerPhoneController = TextEditingController();
-
   final TextEditingController _acresController = TextEditingController();
   final TextEditingController _guntasController = TextEditingController();
   final TextEditingController _hoursController = TextEditingController();
@@ -28,13 +27,14 @@ class _BookingPageState extends State<BookingPage> {
 
   DateTime? _expectedDate;
   int? _selectedServiceId;
-  int _vehicleId = 1; // Hardcoded for now
+  int _vehicleId = 1;
 
   List<Map<String, dynamic>> services = [];
-  List<String> _unitTypeOptions = []; // Unit types fetched from DB
+  List<String> _unitTypeOptions = [];
   String? _selectedUnitType;
 
   bool _loading = false;
+  bool _isEdited = false;
 
   @override
   void initState() {
@@ -61,9 +61,8 @@ class _BookingPageState extends State<BookingPage> {
 
       if (rates.isNotEmpty) {
         setState(() {
-          // Populate unit types dynamically
           _unitTypeOptions = rates.map((r) => r.unitType).toSet().toList();
-          _selectedUnitType = null; // Reset selected unit type
+          _selectedUnitType = null;
         });
       }
     } catch (e) {
@@ -76,6 +75,9 @@ class _BookingPageState extends State<BookingPage> {
         _expectedDate == null ||
         _selectedServiceId == null ||
         _selectedUnitType == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please complete all fields")),
+      );
       return;
     }
 
@@ -101,26 +103,32 @@ class _BookingPageState extends State<BookingPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Booking created successfully")),
       );
-      _formKey.currentState!.reset();
-      _farmerNameController.clear();
-      _farmerPhoneController.clear();
-      _acresController.clear();
-      _guntasController.clear();
-      _hoursController.clear();
-      _minutesController.clear();
-      _kmController.clear();
-      _meterController.clear();
-      setState(() {
-        _expectedDate = null;
-        _selectedServiceId = null;
-        _selectedUnitType = null;
-        _unitTypeOptions.clear();
-      });
+      _resetForm();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to create booking")),
       );
     }
+  }
+
+  void _resetForm() {
+    _formKey.currentState!.reset();
+    _farmerNameController.clear();
+    _farmerPhoneController.clear();
+    _acresController.clear();
+    _guntasController.clear();
+    _hoursController.clear();
+    _minutesController.clear();
+    _kmController.clear();
+    _meterController.clear();
+
+    setState(() {
+      _expectedDate = null;
+      _selectedServiceId = null;
+      _selectedUnitType = null;
+      _unitTypeOptions.clear();
+      _isEdited = false;
+    });
   }
 
   Future<void> _pickDate(BuildContext context) async {
@@ -147,194 +155,214 @@ class _BookingPageState extends State<BookingPage> {
             pickedTime.hour,
             pickedTime.minute,
           );
+          _isEdited = true;
         });
       }
     }
   }
 
+  Future<bool> _onWillPop() async {
+    if (!_isEdited) return true;
+
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Unsaved Changes"),
+        content: const Text("Are you sure you want to leave? Unsaved data will be lost."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text("Leave"),
+          ),
+        ],
+      ),
+    ) ??
+        false;
+  }
+
+  void _markEdited() {
+    if (!_isEdited) {
+      setState(() {
+        _isEdited = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Create Booking")),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              // Farmer name
-              TextFormField(
-                controller: _farmerNameController,
-                decoration:
-                const InputDecoration(labelText: "Farmer Name"),
-                validator: (val) =>
-                val!.isEmpty ? "Enter farmer name" : null,
-              ),
-
-              // Farmer phone
-              TextFormField(
-                controller: _farmerPhoneController,
-                decoration:
-                const InputDecoration(labelText: "Farmer Phone"),
-                keyboardType: TextInputType.phone,
-                validator: (val) =>
-                val!.isEmpty ? "Enter farmer phone" : null,
-              ),
-
-              const SizedBox(height: 10),
-
-              // Service dropdown
-              DropdownButtonFormField<int>(
-                value: _selectedServiceId,
-                items: services.map((s) {
-                  return DropdownMenuItem<int>(
-                    value: s["id"],
-                    child: Text(s["name"]),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedServiceId = val;
-                    _unitTypeOptions.clear();
-                    _selectedUnitType = null;
-                  });
-                  if (val != null) {
-                    _fetchRateByService(val);
-                  }
-                },
-                decoration:
-                const InputDecoration(labelText: "Select Service"),
-                validator: (val) =>
-                val == null ? "Please select a service" : null,
-              ),
-
-              const SizedBox(height: 10),
-
-              // Unit type dropdown
-              if (_unitTypeOptions.isNotEmpty)
-                DropdownButtonFormField<String>(
-                  value: _selectedUnitType,
-                  items: _unitTypeOptions.map((u) {
-                    return DropdownMenuItem<String>(
-                      value: u,
-                      child: Text(u),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Create Booking")),
+        body: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            onChanged: _markEdited,
+            child: ListView(
+              children: [
+                TextFormField(
+                  controller: _farmerNameController,
+                  decoration: const InputDecoration(labelText: "Farmer Name"),
+                  validator: (val) => val!.isEmpty ? "Farmer Name is required" : null,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _farmerPhoneController,
+                  decoration: const InputDecoration(labelText: "Farmer Phone"),
+                  keyboardType: TextInputType.phone,
+                  validator: (val) => val!.isEmpty ? "Farmer Phone is required" : null,
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<int>(
+                  value: _selectedServiceId,
+                  items: services.map((s) {
+                    return DropdownMenuItem<int>(
+                      value: s["id"],
+                      child: Text(s["name"]),
                     );
                   }).toList(),
                   onChanged: (val) {
                     setState(() {
-                      _selectedUnitType = val;
+                      _selectedServiceId = val;
+                      _unitTypeOptions.clear();
+                      _selectedUnitType = null;
                     });
+                    if (val != null) {
+                      _fetchRateByService(val);
+                    }
+                    _markEdited();
                   },
-                  decoration:
-                  const InputDecoration(labelText: "Select Unit Type"),
-                  validator: (val) =>
-                  val == null ? "Please select unit type" : null,
-                ),
-
-              const SizedBox(height: 10),
-
-              // Date Picker with Time
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _expectedDate == null
-                          ? "No Date Chosen"
-                          : DateFormat("yyyy-MM-dd HH:mm")
-                          .format(_expectedDate!),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => _pickDate(context),
-                    child: const Text("Pick Date & Time"),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Conditional fields with UNIT HEADER (ALL SIDE BY SIDE)
-              if (_selectedUnitType != null) ...[
-                Text(
-                  "Unit: $_selectedUnitType",
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+                  decoration: const InputDecoration(labelText: "Select Service"),
+                  validator: (val) => val == null ? "Service is required" : null,
                 ),
                 const SizedBox(height: 10),
+                if (_unitTypeOptions.isNotEmpty)
+                  DropdownButtonFormField<String>(
+                    value: _selectedUnitType,
+                    items: _unitTypeOptions.map((u) {
+                      return DropdownMenuItem<String>(
+                        value: u,
+                        child: Text(u),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() => _selectedUnitType = val);
+                      _markEdited();
+                    },
+                    decoration: const InputDecoration(labelText: "Select Unit Type"),
+                    validator: (val) => val == null ? "Unit Type is required" : null,
+                  ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _expectedDate == null
+                            ? "No Date Chosen"
+                            : DateFormat("yyyy-MM-dd HH:mm").format(_expectedDate!),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => _pickDate(context),
+                      child: const Text("Pick Date & Time"),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                if (_selectedUnitType != null) ...[
+                  Text(
+                    "Unit: $_selectedUnitType",
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                if (_selectedUnitType == "AREA") ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _acresController,
+                          decoration: const InputDecoration(labelText: "Acres"),
+                          keyboardType: TextInputType.number,
+                          validator: (val) =>
+                          val!.isEmpty ? "Acres is required" : null,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _guntasController,
+                          decoration: const InputDecoration(labelText: "Guntas"),
+                          keyboardType: TextInputType.number,
+                          validator: (val) =>
+                          val!.isEmpty ? "Guntas is required" : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                ] else if (_selectedUnitType == "TIME") ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _hoursController,
+                          decoration: const InputDecoration(labelText: "Hours"),
+                          keyboardType: TextInputType.number,
+                          validator: (val) =>
+                          val!.isEmpty ? "Hours is required" : null,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _minutesController,
+                          decoration: const InputDecoration(labelText: "Minutes"),
+                          keyboardType: TextInputType.number,
+                          validator: (val) =>
+                          val!.isEmpty ? "Minutes is required" : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                ] else if (_selectedUnitType == "DISTANCE") ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _kmController,
+                          decoration: const InputDecoration(labelText: "Kilometers"),
+                          keyboardType: TextInputType.number,
+                          validator: (val) =>
+                          val!.isEmpty ? "Kilometers is required" : null,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _meterController,
+                          decoration: const InputDecoration(labelText: "Meters"),
+                          keyboardType: TextInputType.number,
+                          validator: (val) =>
+                          val!.isEmpty ? "Meters is required" : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _submitBooking,
+                  child: const Text("Submit Booking"),
+                ),
               ],
-
-              if (_selectedUnitType == "AREA") ...[
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _acresController,
-                        decoration: const InputDecoration(labelText: "Acres"),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _guntasController,
-                        decoration: const InputDecoration(labelText: "Guntas"),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-              ] else if (_selectedUnitType == "TIME") ...[
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _hoursController,
-                        decoration: const InputDecoration(labelText: "Hours"),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _minutesController,
-                        decoration: const InputDecoration(labelText: "Minutes"),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-              ] else if (_selectedUnitType == "DISTANCE") ...[
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _kmController,
-                        decoration:
-                        const InputDecoration(labelText: "Kilometers"),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _meterController,
-                        decoration: const InputDecoration(labelText: "Meters"),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-
-              const SizedBox(height: 20),
-
-              ElevatedButton(
-                onPressed: _submitBooking,
-                child: const Text("Submit Booking"),
-              ),
-            ],
+            ),
           ),
         ),
       ),
