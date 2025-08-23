@@ -37,9 +37,9 @@ class RateService {
   }
 
   /// Update an existing service
-  static Future<bool> updateService(CreateRateDTO service) async {
+  static Future<bool> updateService(CreateRateDTO service, int? rateId) async {
     final response = await http.put(
-      Uri.parse('$serviceEndpoint/${service.serviceId}'),
+      Uri.parse('$serviceEndpoint/${rateId}'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(service.toJson()),
     );
