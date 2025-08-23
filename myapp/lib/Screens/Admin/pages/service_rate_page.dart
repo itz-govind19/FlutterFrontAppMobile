@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/dto/farmerservice.dart'; // Service model
-import 'package:myapp/services/farmservices.dart'; // Service CRUD
+import 'package:myapp/dto/services_model.dart'; // Service model
+import 'package:myapp/services/services_service.dart'; // Service CRUD
 import 'package:myapp/dto/vehicle_model.dart'; // Vehicle model
 import 'package:myapp/services/vehicle_service.dart'; // Vehicle service
 

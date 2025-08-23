@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:myapp/constants.dart';
-import 'package:myapp/dto/farmerservice.dart';
+import 'package:myapp/dto/services_model.dart';
 
 class FarmerService {
   static final String? baseUrl =

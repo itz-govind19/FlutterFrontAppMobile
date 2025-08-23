@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:myapp/dto/farmerservice.dart';
-import 'package:myapp/services/farmservices.dart';
+import 'package:myapp/dto/services_model.dart';
+import 'package:myapp/services/services_service.dart';
 import 'package:myapp/dto/rate_model.dart';
 import 'package:myapp/services/rate_service.dart';
 

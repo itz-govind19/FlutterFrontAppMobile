@@ -52,4 +52,17 @@ class RateService {
     final response = await http.delete(Uri.parse('$serviceEndpoint/$id'));
     return response.statusCode == 200;
   }
+
+  /// Fetch rate by serviceId
+  static Future<List<RateDTO>> fetchRateByServiceId(int serviceId) async {
+    final response =
+    await http.get(Uri.parse("$serviceEndpoint/service/$serviceId"));
+
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      return data.map((json) => RateDTO.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load services');
+    }
+  }
 }
