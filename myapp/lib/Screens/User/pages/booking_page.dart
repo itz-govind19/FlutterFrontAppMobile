@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:myapp/Screens/User/pages/payment_page.dart';
 import 'package:myapp/dto/Booking_model.dart';
+import 'package:myapp/dto/Payment_model.dart';
 import 'package:myapp/services/booking_service.dart';
 import 'package:myapp/services/rate_service.dart';
 import 'package:myapp/services/services_service.dart';
@@ -15,7 +17,6 @@ class BookingPage extends StatefulWidget {
 class _BookingPageState extends State<BookingPage> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
   final TextEditingController _farmerNameController = TextEditingController();
   final TextEditingController _farmerPhoneController = TextEditingController();
   final TextEditingController _acresController = TextEditingController();
@@ -100,8 +101,41 @@ class _BookingPageState extends State<BookingPage> {
     setState(() => _loading = false);
 
     if (created != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Booking created successfully")),
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Booking Successful"),
+          content: Text(
+            "Your booking reference ID: ${created.referenceId}\n"
+                "Total Amount: ₹${created.totalAmount}\n\n"
+                "Do you want to make payment now?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Later"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+
+                final payment = PaymentDTO1(
+                  referenceId: created.referenceId,
+                  amount: created.totalAmount,
+                  upiId: "ownerupi@oksbi", // ⚠️ replace with actual UPI ID
+                  payeeName: "Tractor Owner",
+                );
+
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => PaymentPage(payment: payment),
+                  ),
+                );
+              },
+              child: const Text("Pay Now"),
+            ),
+          ],
+        ),
       );
       _resetForm();
     } else {
@@ -180,8 +214,7 @@ class _BookingPageState extends State<BookingPage> {
           ),
         ],
       ),
-    ) ??
-        false;
+    ) ?? false;
   }
 
   void _markEdited() {
@@ -269,8 +302,8 @@ class _BookingPageState extends State<BookingPage> {
                             : DateFormat("yyyy-MM-dd HH:mm").format(_expectedDate!),
                         style: TextStyle(
                           color: _expectedDate == null
-                              ? Colors.red // Color when date is not selected
-                              : Colors.black, // Default color
+                              ? Colors.red
+                              : Colors.black,
                         ),
                       ),
                     ),

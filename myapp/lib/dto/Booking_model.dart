@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class CreateBookingDTO {
   DateTime expectedDate;
   String farmerName;
@@ -73,6 +75,8 @@ class BookingDTO {
   final int? minutes;
   final double? kilometers;
   final double? meters;
+  final String referenceId;
+  final double totalAmount;
 
   BookingDTO({
     this.bookingId,
@@ -88,6 +92,8 @@ class BookingDTO {
     this.minutes,
     this.kilometers,
     this.meters,
+    required this.referenceId,
+    required this.totalAmount,
   });
 
   factory BookingDTO.fromJson(Map<String, dynamic> json) => BookingDTO(
@@ -106,6 +112,8 @@ class BookingDTO {
     minutes: json['minutes'] as int?,
     kilometers: (json['kilometers'] != null) ? (json['kilometers'] as num).toDouble() : null,
     meters: (json['meters'] != null) ? (json['meters'] as num).toDouble() : null,
+    referenceId: json['referenceId'] as String,
+    totalAmount: (json['totalAmount'] ?? 0).toDouble(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -122,5 +130,7 @@ class BookingDTO {
     'minutes': minutes,
     'kilometers': kilometers,
     'meters': meters,
+    'referenceId': referenceId,
+    'totalAmount': totalAmount,
   };
 }
