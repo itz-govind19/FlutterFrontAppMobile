@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:myapp/Screens/Admin/admin_home.dart';
 import 'package:myapp/Screens/User/user_home.dart';
@@ -35,12 +38,19 @@ class _LoginFormState extends State<LoginForm> {
         _passwordController.text,
       );
 
-      String token = response["token"];
+      String? token = response["token"];
+      if (token == null) {
+        setState(() {
+          _errorMessage = response["message"];
+        });
+        return;
+      }
+
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       await TokenManager.saveToken(token);
 
-      String username = decodedToken["sub"];   // username claim
-      String role = decodedToken["roles"];     // e.g., "ADMIN", "USER", "GUEST"
+      String username = decodedToken["sub"]; // username claim
+      String role = decodedToken["roles"]; // e.g., "ADMIN", "USER", "GUEST"
 
       Widget nextScreen;
 
@@ -59,6 +69,14 @@ class _LoginFormState extends State<LoginForm> {
         context,
         MaterialPageRoute(builder: (context) => nextScreen),
       );
+    } on SocketException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    } on http.ClientException catch (e) {
+      setState(() {
+        _errorMessage = "Technical Error, Contact Administrator.";
+      });
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();

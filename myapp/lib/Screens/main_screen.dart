@@ -92,6 +92,7 @@ class _MainScreenState extends State<MainScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.book_online), label: "Booking"),
+          BottomNavigationBarItem(icon: Icon(Icons.payment), label: "Payment"),
           BottomNavigationBarItem(icon: Icon(Icons.queue), label: "Queue"),
           BottomNavigationBarItem(icon: Icon(Icons.info), label: "About"),
         ],
