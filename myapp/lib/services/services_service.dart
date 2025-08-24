@@ -31,7 +31,10 @@ class FarmerService {
 
     if (response.statusCode == 201 || response.statusCode == 200) {
       return Service.fromJson(jsonDecode(response.body));
-    } else {
+    }else if(response.statusCode==500){
+      response.body;
+    }
+    else {
       return null;
     }
   }
