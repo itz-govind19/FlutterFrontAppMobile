@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:myapp/l10n/app_localizations.dart';
 
 import '../../../constants.dart';
 
@@ -12,8 +13,8 @@ class LoginScreenTopImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text(
-          "LOGIN",
+        Text(
+          AppLocalizations.of(context)!.login.toUpperCase(),
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: defaultPadding * 2),

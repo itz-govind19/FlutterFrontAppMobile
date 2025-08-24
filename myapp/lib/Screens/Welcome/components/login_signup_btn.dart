@@ -4,6 +4,7 @@ import 'package:myapp/Screens/guest/guest_home.dart';
 import '../../../constants.dart';
 import '../../Login/login_screen.dart';
 import '../../Signup/signup_screen.dart';
+import 'package:myapp/l10n/app_localizations.dart';
 
 class LoginAndSignupBtn extends StatelessWidget {
   const LoginAndSignupBtn({
@@ -26,7 +27,7 @@ class LoginAndSignupBtn extends StatelessWidget {
             );
           },
           child: Text(
-            "Login".toUpperCase(),
+            AppLocalizations.of(context)!.login.toUpperCase(),
           ),
         ),
         const SizedBox(height: 16),
@@ -46,7 +47,7 @@ class LoginAndSignupBtn extends StatelessWidget {
             elevation: 0,
           ),
           child: Text(
-            "Sign Up".toUpperCase(),
+            AppLocalizations.of(context)!.signup.toUpperCase(),
             style: const TextStyle(color: Colors.black),
           ),
         ),
@@ -63,9 +64,9 @@ class LoginAndSignupBtn extends StatelessWidget {
               ),
             );
           },
-          child: const Text(
-            "Continue as Guest",
-            style: TextStyle(color: Colors.blue, fontSize: 16),
+          child: Text(
+            AppLocalizations.of(context)!.guest,
+            style: const TextStyle(color: Colors.blue, fontSize: 16),
           ),
         ),
       ],

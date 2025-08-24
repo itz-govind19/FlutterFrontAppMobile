@@ -1,0 +1,45 @@
+{
+  "@@locale": "en",
+  "appTitle": "Flutter Auth",
+  "welcome": "Welcome",
+  "welcomeMessage": "Welcome to our app! Please choose an option to continue.",
+  "login": "Login",
+  "signup": "Sign Up",
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "fullName": "Full Name",
+  "forgotPassword": "Forgot Password?",
+  "dontHaveAccount": "Don't have an account?",
+  "alreadyHaveAccount": "Already have an account?",
+  "signInWithGoogle": "Sign in with Google",
+  "signUpWithGoogle": "Sign up with Google",
+  "or": "OR",
+  "admin": "Admin",
+  "user": "User",
+  "guest": "Guest",
+  "home": "Home",
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Logout",
+  "language": "Language",
+  "english": "English",
+  "hindi": "हिन्दी",
+  "marathi": "मराठी",
+  "selectLanguage": "Select Language",
+  "dashboard": "Dashboard",
+  "hello": "Hello",
+  "@hello": {
+    "description": "Greeting message"
+  },
+  "welcomeUser": "Welcome, {username}!",
+  "@welcomeUser": {
+    "description": "Welcome message with username",
+    "placeholders": {
+      "username": {
+        "type": "String",
+        "example": "John"
+      }
+    }
+  }
+}

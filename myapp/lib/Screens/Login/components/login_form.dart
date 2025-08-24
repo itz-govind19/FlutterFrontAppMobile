@@ -7,7 +7,9 @@ import 'package:myapp/Screens/Admin/admin_home.dart';
 import 'package:myapp/Screens/User/user_home.dart';
 import 'package:myapp/Screens/guest/guest_home.dart';
 import 'package:myapp/auth/api_service.dart';
+import 'package:myapp/l10n/app_localizations.dart';
 import 'package:myapp/security/token_manager.dart';
+import 'package:myapp/utils/string_utils.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -102,7 +104,7 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _passwordController,
-            decoration: const InputDecoration(labelText: "Password"),
+            decoration: InputDecoration(labelText: StringUtils.capitalize(AppLocalizations.of(context)!.password.toLowerCase())),
             obscureText: true,
             validator: (value) => value!.isEmpty ? "Enter password" : null,
           ),
