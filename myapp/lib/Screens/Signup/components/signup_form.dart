@@ -71,35 +71,29 @@ class _SignUpFormState extends State<SignUpForm> {
         setState(() {
           _errorMessage = e.message;
         });
-      } on http.ClientException catch (e) {
+      } on http.ClientException catch (_) {
         setState(() {
           _errorMessage = "Technical Error, Contact Administrator.";
         });
       } catch (e) {
         String errorMsg = "Registration failed. Please try again.";
         try {
-          // Convert the full exception to string
           final errorString = e.toString();
-
-          // Find the index of the first `{` to extract the JSON part
           final jsonStart = errorString.indexOf('{');
           if (jsonStart != -1) {
             final jsonPart = errorString.substring(jsonStart);
             final decoded = jsonDecode(jsonPart);
-              errorMsg = decoded["message"];
+            errorMsg = decoded["message"];
             setState(() {
               _errorMessage = errorMsg;
             });
           }
         } catch (_) {
-          // Fallback in case parsing fails
-          errorMsg = e.toString();
           setState(() {
             _errorMessage = "Technical Error, Contact Administrator.";
           });
         }
-      }
-      finally {
+      } finally {
         setState(() => _isLoading = false);
       }
     }
@@ -154,7 +148,15 @@ class _SignUpFormState extends State<SignUpForm> {
                 child: Icon(Icons.email),
               ),
             ),
-            validator: (value) => value!.isEmpty ? "Please enter email" : null,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter email";
+              } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$')
+                  .hasMatch(value)) {
+                return "Please enter a valid email address";
+              }
+              return null;
+            },
           ),
           TextFormField(
             controller: _mobileController,
@@ -167,7 +169,14 @@ class _SignUpFormState extends State<SignUpForm> {
                 child: Icon(Icons.phone),
               ),
             ),
-            validator: (value) => value!.isEmpty ? "Please enter mobile" : null,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter mobile";
+              } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                return "Mobile number must be exactly 10 digits";
+              }
+              return null;
+            },
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: defaultPadding),
@@ -182,7 +191,8 @@ class _SignUpFormState extends State<SignUpForm> {
                   child: Icon(Icons.lock),
                 ),
               ),
-              validator: (value) => value!.isEmpty ? "Please enter password" : null,
+              validator: (value) =>
+              value!.isEmpty ? "Please enter password" : null,
             ),
           ),
           const SizedBox(height: defaultPadding / 2),
