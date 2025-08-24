@@ -4,12 +4,9 @@
   "welcome": "Welcome",
   "welcomeMessage": "Welcome to our app! Please choose an option to continue.",
   "login": "Login",
-  "signup": "Sign Up",
   "email": "Email",
   "password": "Password",
   "username": "Username",
-  "enterUsername": "Enter username",
-  "enterPassword": "Enter password",
   "technicalError": "Technical Error, Contact Administrator.",
   "confirmPassword": "Confirm Password",
   "fullName": "Full Name",
@@ -45,5 +42,20 @@
         "example": "John"
       }
     }
-  }
+  },
+  "signupSuccessTitle": "Success",
+  "signupSuccessMessage": "Registered successfully. Please log in.",
+  "ok": "OK",
+  "name": "Full Name",
+  "enterName": "Please enter your name",
+  "enterUsername": "Please enter username",
+  "enterEmail": "Please enter email",
+  "invalidEmail": "Please enter a valid email address",
+  "mobile": "Mobile",
+  "enterMobile": "Please enter mobile",
+  "invalidMobile": "Mobile number must be exactly 10 digits",
+  "enterPassword": "Please enter password",
+  "signUp": "Sign Up",
+  "signIn": "Sign In",
+  "registrationFailed": "Registration failed. Please try again."
 }

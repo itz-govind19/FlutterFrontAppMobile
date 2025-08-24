@@ -47,7 +47,7 @@ class LoginAndSignupBtn extends StatelessWidget {
             elevation: 0,
           ),
           child: Text(
-            AppLocalizations.of(context)!.signup.toUpperCase(),
+            AppLocalizations.of(context)!.signUp.toUpperCase(),
             style: const TextStyle(color: Colors.black),
           ),
         ),

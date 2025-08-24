@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:myapp/auth/api_service.dart';
 import 'package:myapp/dto/sign_up_model.dart';
+import 'package:myapp/l10n/app_localizations.dart';
+import 'package:myapp/utils/string_utils.dart';
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants.dart';
 import '../../Login/login_screen.dart';
@@ -51,8 +53,8 @@ class _SignUpFormState extends State<SignUpForm> {
           context: context,
           barrierDismissible: false,
           builder: (ctx) => AlertDialog(
-            title: const Text("Success"),
-            content: const Text("Registered successfully. Please log in."),
+            title: Text(AppLocalizations.of(context)!.signupSuccessTitle),
+            content: Text(AppLocalizations.of(context)!.signupSuccessMessage),
             actions: [
               TextButton(
                 onPressed: () {
@@ -62,7 +64,7 @@ class _SignUpFormState extends State<SignUpForm> {
                     MaterialPageRoute(builder: (context) => const LoginScreen()),
                   );
                 },
-                child: const Text("OK"),
+                child: Text(AppLocalizations.of(context)!.ok.toUpperCase()),
               ),
             ],
           ),
@@ -73,10 +75,10 @@ class _SignUpFormState extends State<SignUpForm> {
         });
       } on http.ClientException catch (_) {
         setState(() {
-          _errorMessage = "Technical Error, Contact Administrator.";
+          _errorMessage = StringUtils.capitalize(AppLocalizations.of(context)!.technicalError.toLowerCase());
         });
       } catch (e) {
-        String errorMsg = "Registration failed. Please try again.";
+        String errorMsg = AppLocalizations.of(context)!.registrationFailed;
         try {
           final errorString = e.toString();
           final jsonStart = errorString.indexOf('{');
@@ -90,7 +92,7 @@ class _SignUpFormState extends State<SignUpForm> {
           }
         } catch (_) {
           setState(() {
-            _errorMessage = "Technical Error, Contact Administrator.";
+            _errorMessage = AppLocalizations.of(context)!.technicalError;
           });
         }
       } finally {
@@ -116,33 +118,33 @@ class _SignUpFormState extends State<SignUpForm> {
           TextFormField(
             controller: _nameController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              hintText: "Full Name",
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.name,
               prefixIcon: Padding(
                 padding: EdgeInsets.all(defaultPadding),
                 child: Icon(Icons.person),
               ),
             ),
-            validator: (value) => value!.isEmpty ? "Please enter your name" : null,
+            validator: (value) => value!.isEmpty ? AppLocalizations.of(context)!.enterEmail : null,
           ),
           TextFormField(
             controller: _usernameController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              hintText: "Username",
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.username,
               prefixIcon: Padding(
                 padding: EdgeInsets.all(defaultPadding),
                 child: Icon(Icons.account_circle),
               ),
             ),
-            validator: (value) => value!.isEmpty ? "Please enter username" : null,
+            validator: (value) => value!.isEmpty ? AppLocalizations.of(context)!.enterUsername : null,
           ),
           TextFormField(
             controller: _emailController,
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              hintText: "Email",
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.email,
               prefixIcon: Padding(
                 padding: EdgeInsets.all(defaultPadding),
                 child: Icon(Icons.email),
@@ -150,10 +152,10 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return "Please enter email";
+                return AppLocalizations.of(context)!.enterEmail;
               } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$')
                   .hasMatch(value)) {
-                return "Please enter a valid email address";
+                return AppLocalizations.of(context)!.invalidEmail;
               }
               return null;
             },
@@ -162,8 +164,8 @@ class _SignUpFormState extends State<SignUpForm> {
             controller: _mobileController,
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(
-              hintText: "Mobile",
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.mobile,
               prefixIcon: Padding(
                 padding: EdgeInsets.all(defaultPadding),
                 child: Icon(Icons.phone),
@@ -171,9 +173,9 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return "Please enter mobile";
+                return AppLocalizations.of(context)!.enterMobile;
               } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
-                return "Mobile number must be exactly 10 digits";
+                return AppLocalizations.of(context)!.invalidMobile;
               }
               return null;
             },
@@ -184,15 +186,15 @@ class _SignUpFormState extends State<SignUpForm> {
               controller: _passwordController,
               obscureText: true,
               textInputAction: TextInputAction.done,
-              decoration: const InputDecoration(
-                hintText: "Password",
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.password,
                 prefixIcon: Padding(
                   padding: EdgeInsets.all(defaultPadding),
                   child: Icon(Icons.lock),
                 ),
               ),
               validator: (value) =>
-              value!.isEmpty ? "Please enter password" : null,
+              value!.isEmpty ? AppLocalizations.of(context)!.enterPassword : null,
             ),
           ),
           const SizedBox(height: defaultPadding / 2),
@@ -200,7 +202,7 @@ class _SignUpFormState extends State<SignUpForm> {
               ? const CircularProgressIndicator()
               : ElevatedButton(
             onPressed: _submitForm,
-            child: Text("Sign Up".toUpperCase()),
+            child: Text(AppLocalizations.of(context)!.signUp.toUpperCase()),
           ),
           const SizedBox(height: defaultPadding),
           AlreadyHaveAnAccountCheck(
