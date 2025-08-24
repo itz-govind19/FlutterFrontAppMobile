@@ -29,5 +29,9 @@
   "selectLanguage": "भाषा निवडा",
   "dashboard": "डॅशबोर्ड",
   "hello": "नमस्कार",
-  "welcomeUser": "स्वागत आहे, {username}!"
+  "welcomeUser": "स्वागत आहे, {username}!",
+  "username": "वापरकर्ता नाव",
+  "enterUsername": "वापरकर्ता नाव टाका",
+  "enterPassword": "पासवर्ड टाका",
+  "technicalError": "तांत्रिक त्रुटी, व्यवस्थापकाशी संपर्क साधा."
 }

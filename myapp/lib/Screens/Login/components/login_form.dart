@@ -77,7 +77,7 @@ class _LoginFormState extends State<LoginForm> {
       });
     } on http.ClientException catch (e) {
       setState(() {
-        _errorMessage = "Technical Error, Contact Administrator.";
+        _errorMessage = StringUtils.capitalize(AppLocalizations.of(context)!.technicalError.toLowerCase());
       });
     } catch (e) {
       setState(() {
@@ -98,15 +98,15 @@ class _LoginFormState extends State<LoginForm> {
         children: [
           TextFormField(
             controller: _usernameController,
-            decoration: const InputDecoration(labelText: "Username"),
-            validator: (value) => value!.isEmpty ? "Enter username" : null,
+            decoration: InputDecoration(labelText: StringUtils.capitalize(AppLocalizations.of(context)!.username.toLowerCase())),
+            validator: (value) => value!.isEmpty ? StringUtils.capitalize(AppLocalizations.of(context)!.enterUsername.toLowerCase()) : null,
           ),
           const SizedBox(height: 16),
           TextFormField(
             controller: _passwordController,
             decoration: InputDecoration(labelText: StringUtils.capitalize(AppLocalizations.of(context)!.password.toLowerCase())),
             obscureText: true,
-            validator: (value) => value!.isEmpty ? "Enter password" : null,
+            validator: (value) => value!.isEmpty ? StringUtils.capitalize(AppLocalizations.of(context)!.enterPassword.toLowerCase()) : null,
           ),
           const SizedBox(height: 24),
           if (_errorMessage != null)
@@ -115,7 +115,7 @@ class _LoginFormState extends State<LoginForm> {
             onPressed: _isLoading ? null : _login,
             child: _isLoading
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text("Login"),
+                : Text(StringUtils.capitalize(AppLocalizations.of(context)!.login.toLowerCase())),
           ),
         ],
       ),
